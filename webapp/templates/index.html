@@ -373,7 +373,7 @@
                         {{ '⚠️' if prediction == 'HIGH RISK' else '✅' }} {{ prediction }}
                     </div>
                     <div class="risk-prob">
-                        30-day Readmission Probability: <strong>{{ probability }}%</strong>
+                        30-day Readmission Probability: <strong><span id="probCounter">0</span>%</strong>
                     </div>
                 </div>
             </div>
@@ -529,5 +529,50 @@
             }
         }
     </script>
+    <script>
+// Probability counter animation
+const target = {{ probability }};
+const counter = document.getElementById('probCounter');
+if (counter) {
+    let current = 0;
+    const increment = target / 60;
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        counter.textContent = current.toFixed(1);
+    }, 16);
+}
+
+// Staggered card animations
+const resultCards = document.querySelectorAll('.result-reveal');
+resultCards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 200 + (index * 150));
+});
+
+// Risk badge pulse animation
+const badge = document.querySelector('.risk-badge');
+if (badge) {
+    setTimeout(() => {
+        badge.style.animation = 'badgePulse 0.6s ease';
+    }, 400);
+}
+</script>
+
+<style>
+@keyframes badgePulse {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+</style>
 </body>
 </html>
